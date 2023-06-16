@@ -7,9 +7,11 @@ import EditProfilePopup from "./EditProfilePopup.js";
 import EditAvatarPopup from "./EditAvatarPopup.js";
 import AddPlacePopup from "./AddPlacePopup.js";
 import ImagePopup from "./ImagePopup.js";
+import Login from "./Login.js";
 import {api } from "../utils/api.js";
 import {CurrentUserContext } from "../context/CurrentUserContext.js";
 import {Routes, Route} from 'react-router-dom'
+import { ProtectedRoute } from "./ProtectedRoute.js";
 
 function App() {
   const [isEditAvatarPopupOpen, setEditAvatarPopup] = React.useState(false);
@@ -119,9 +121,11 @@ function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="root">
         <div className="page">
-          <Header />
+          <Header text="Регистрация"/>
           <Routes>
-            <Route path="/" element={< Login/>} />
+            <Route path="/" element={
+              <ProtectedRoute element={<Login/>} isLoggedIn = {isLoggedIn}/>
+            }/>
           </Routes>
           <Main
             onEditAvatar={handleEditAvatarClick}
