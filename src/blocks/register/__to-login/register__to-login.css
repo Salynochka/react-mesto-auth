@@ -4,4 +4,11 @@
     font-size: 14px;
     line-height: 17px;
     text-align: center;
+    text-decoration: none;
+    color: white;
+}
+
+.register__to-login:hover{
+    opacity: 0.8;
+    cursor: pointer;
 }

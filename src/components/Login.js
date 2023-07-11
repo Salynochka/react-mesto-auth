@@ -1,13 +1,13 @@
 import React from "react";
 import Header from "./Header.js";
-import {authorize} from "./auth.js";
+import * as auth from "../utils/auth.js";
 import {useNavigate} from "react-router-dom";
 //import Register from "./Register.js";
 
 function Login(props) {
   const [formValue, setFormValue] = React.useState({
-    username: "",
     password: "",
+    email: "",
   });
   const navigate = useNavigate()
 
@@ -19,16 +19,12 @@ function Login(props) {
     });
   }
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    if (!formValue.username || !formValue.password){
-      return;
-    }
-    authorize(formValue.username, formValue.password)
+  function handleSubmit() {
+    auth.login(formValue.password, formValue.email)
       .then((data) => {
         if (data.jwt){
-          setFormValue({username: '', password: ''});
-          navigate('/mesto', {replace: true});
+          setFormValue({password: '', email: ''});
+          navigate('/main', {replace: true});
         }
       })
       .catch(err => console.log(err));
@@ -38,6 +34,7 @@ function Login(props) {
     <>
       <Header 
         text="Регистрация" 
+        link="signup"
       />
       <section className="login">
         <div className="login__container">

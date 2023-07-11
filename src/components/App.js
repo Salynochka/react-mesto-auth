@@ -8,6 +8,7 @@ import ImagePopup from "./ImagePopup.js";
 import Login from "./Login.js";
 import Register from "./Register.js";
 import InfoToolTip from "./InfoToolTip.js";
+import * as auth from "../utils/auth.js";
 import { api } from "../utils/api.js";
 import { CurrentUserContext } from "../context/CurrentUserContext.js";
 import { Routes, Route, Navigate } from "react-router-dom";
@@ -24,6 +25,7 @@ function App() {
   const [cards, setCards] = React.useState([]);
 
   const [isLoggedIn, setLoggedIn] = React.useState(false);
+  const [email, setEmail] = React.useState('');
 
   React.useEffect(() => {
     api
@@ -119,16 +121,31 @@ function App() {
       .catch((err) => console.error(`Ошибка: ${err}`));
   }
 
+  function checkActiveToken(){
+    const jwt = localStorage.getItem('jwt')
+
+    if (jwt){
+      auth.checkToken(jwt)
+      .then((res)=>{
+        if (res){
+          setLoggedIn(true)
+          setEmail(res.data.email)
+        }
+      })
+      .catch((err) => console.log(err))
+    }
+  }
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="root">
         <div className="page">
           <Routes>
-            <Route path="/mesto" element={
+            <Route path="/" element={
                 <ProtectedRoute element={Main} isLoggedIn={isLoggedIn} />
             } />
             <Route
-              path="/"
+              path="/main"
               element={
                 <Main
                   onEditAvatar={handleEditAvatarClick}
@@ -142,7 +159,7 @@ function App() {
               }
             />
             <Route
-              path="/login"
+              path="/signin"
               element={
                 <Login
                   title="Вход"

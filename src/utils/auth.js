@@ -1,14 +1,28 @@
 export const BASE_URL = "https://auth.nomoreparties.co";
 
-export const register = (email, somepassword) => {
+export const register = (email, password) => {
   return fetch(`${BASE_URL}/signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      password: somepassword,
-      email: email 
+      password: password,
+      email: email
+    }),
+  })
+    .then((response) => response.json())
+}
+
+export const login = (email, password) => {
+  return fetch(`${BASE_URL}/signin`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      password: password,
+      email: email
     }),
   })
     .then((response) => response.json())
@@ -23,28 +37,7 @@ export const register = (email, somepassword) => {
     .catch((err) => console.log(err));
 }
 
-export const authorize = (identifier, password) => {
-  return fetch(`${BASE_URL}/signin`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      password: password,
-      email: identifier
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.jwt) {
-        localStorage.setItem("jwt", data.jwt);
-        return data;
-      }
-    })
-    .catch((err) => console.log(err));
-}
-
-export const getContent = (token) => {
+export const checkToken = (token) => {
   return fetch(`${BASE_URL}/users/me`, {
     method: "GET",
     headers: {
