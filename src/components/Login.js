@@ -37,9 +37,9 @@ function Login(props) {
         link="signup"
       />
       <section className="login">
-        <div className="login__container">
+        <div className="login__container" onSubmit={handleSubmit}>
           <h2 className="login__heading">{props.title}</h2>
-          <form onSubmit={props.onSubmit} className="login__form" name="login">
+          <form className="login__form" name="login">
             <fieldset className="login__input">
               <input
                 type="text"

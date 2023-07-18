@@ -3,12 +3,18 @@ import pencil from "../images/pencil.svg";
 import Card from "./Card.js";
 import Footer from "./Footer.js";
 import { CurrentUserContext } from "../context/CurrentUserContext.js";
+import Header from "./Header.js";
 
 function Main(props) {
   const currentUser = React.useContext(CurrentUserContext);
 
   return (
     <>
+      <Header 
+        text="Выйти"
+        link="signin"
+        //title={email}
+      />
       <main>
         <section className="profile">
           <div className="profile__container">

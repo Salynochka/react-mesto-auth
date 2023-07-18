@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Main from "./Main.js";
 import PopupWithForm from "./PopupWithForm.js";
 import EditProfilePopup from "./EditProfilePopup.js";
@@ -11,7 +11,7 @@ import InfoToolTip from "./InfoToolTip.js";
 import * as auth from "../utils/auth.js";
 import { api } from "../utils/api.js";
 import { CurrentUserContext } from "../context/CurrentUserContext.js";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute.js";
 
 function App() {
@@ -25,7 +25,13 @@ function App() {
   const [cards, setCards] = React.useState([]);
 
   const [isLoggedIn, setLoggedIn] = React.useState(false);
-  const [email, setEmail] = React.useState('');
+
+  const [isRegistration, setIsRegistration] = React.useState(false);
+  const [email, setEmail] = React.useState("");
+
+  const [infoToolTip, setInfoTooltip] = React.useState(false);
+
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     api
@@ -121,19 +127,66 @@ function App() {
       .catch((err) => console.error(`Ошибка: ${err}`));
   }
 
-  function checkActiveToken(){
-    const jwt = localStorage.getItem('jwt')
-
-    if (jwt){
-      auth.checkToken(jwt)
-      .then((res)=>{
-        if (res){
-          setLoggedIn(true)
-          setEmail(res.data.email)
-        }
+  function handleRegistration(email, password) {
+    auth
+      .register(email, password)
+      .then(() => {
+        setIsRegistration(true);
+        setInfoTooltip(true);
+        navigate("/signin", { replace: true });
       })
-      .catch((err) => console.log(err))
-    }
+      .catch((err) => {
+        setIsRegistration(false);
+        setInfoTooltip(true);
+        console.log(err);
+      });
+  }
+
+  function handleLogin(email, password) {
+    auth
+      .login(email, password)
+      .then((data) => {
+        setLoggedIn(true);
+        localStorage.setItem("token", data.token);
+        checkActiveToken(data.token);
+        setEmail(data.email);
+        navigate("/main", { replace: true });
+      })
+      .catch((err) => {
+        setIsRegistration(false);
+        setInfoTooltip(true);
+        console.log(err);
+      });
+  }
+
+  function checkActiveToken() {
+    const jwt = localStorage.getItem('jwt');
+
+    auth
+      .checkToken(jwt)
+      .then((res) => {
+        if (!res) {
+          return;
+        }
+        setLoggedIn(true);
+        setEmail(res);
+       // navigate("/main", { replace: true });
+      })
+      .catch((err) => {
+        setLoggedIn(false);
+        console.log(err);
+      });
+  }
+
+  React.useEffect(() => {
+    checkActiveToken();
+  }, []);
+
+  function handleSignOut() {
+    setLoggedIn(false);
+    localStorage.removeItem("jwt");
+    setEmail("");
+    navigate("/signin", { replace: true });
   }
 
   return (
@@ -141,13 +194,12 @@ function App() {
       <div className="root">
         <div className="page">
           <Routes>
-            <Route path="/" element={
-                <ProtectedRoute element={Main} isLoggedIn={isLoggedIn} />
-            } />
             <Route
-              path="/main"
+              path="/"
               element={
-                <Main
+                <ProtectedRoute
+                  element={Main}
+                  isLoggedIn={isLoggedIn}
                   onEditAvatar={handleEditAvatarClick}
                   onEditProfile={handleEditProfileClick}
                   onAddPlace={handleAddPlaceClick}
@@ -161,9 +213,10 @@ function App() {
             <Route
               path="/signin"
               element={
-                <Login
-                  title="Вход"
-                  buttonText="Войти"
+                <Login 
+                  title="Вход" 
+                  buttonText="Войти" 
+                  onSubmit={handleLogin} 
                 />
               }
             />
@@ -173,11 +226,11 @@ function App() {
                 <Register
                   title="Регистрация"
                   buttonText="Зарегистрироваться"
+                  onSubmit={handleRegistration}
                 />
               }
             />
             <Route
-              path="/"
               element={
                 <EditAvatarPopup
                   isOpen={isEditAvatarPopupOpen}
@@ -187,7 +240,6 @@ function App() {
               }
             />
             <Route
-              path="/"
               element={
                 <EditProfilePopup
                   isOpen={isEditProfilePopupOpen}
@@ -197,7 +249,6 @@ function App() {
               }
             />
             <Route
-              path="/"
               element={
                 <AddPlacePopup
                   isOpen={isAddPlacePopupOpen}
@@ -207,7 +258,6 @@ function App() {
               }
             />
             <Route
-              path="/"
               element={
                 <PopupWithForm
                   title="Вы уверены?"
@@ -218,7 +268,6 @@ function App() {
               }
             />
             <Route
-              path="/"
               element={
                 <ImagePopup
                   card={selectedCard}

@@ -24,7 +24,7 @@ function Register(props) {
     if (!formValue.password || !formValue.email){
       return;
     }
-    auth.register(formValue.password, formValue.email)
+    auth.register({password:formValue.password, email:formValue.email})
       .then((data) => {
         if (data.jwt){
           setFormValue({password: '', email: ''});
@@ -41,7 +41,7 @@ function Register(props) {
         link="signin"
       />
       <section className="register">
-        <div className="register__container">
+        <div className="register__container" onSubmit={handleSubmit}>
           <h2 className="register__heading">{props.title}</h2>
           <form
             className="register__form"
@@ -74,7 +74,7 @@ function Register(props) {
             <button className="register__button" type="submit" onSubmit={handleSubmit}>
               {props.buttonText}
             </button>
-            <a className="register__to-login" href="Login">Уже зарегистрированы? Войти</a>
+            <a className="register__to-login" href="signin">Уже зарегистрированы? Войти</a>
           </form>
         </div>
       </section>
