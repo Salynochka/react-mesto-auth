@@ -11,7 +11,7 @@ import InfoToolTip from "./InfoToolTip.js";
 import * as auth from "../utils/auth.js";
 import { api } from "../utils/api.js";
 import { CurrentUserContext } from "../context/CurrentUserContext.js";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Navigate} from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute.js";
 
 function App() {
@@ -127,30 +127,33 @@ function App() {
       .catch((err) => console.error(`Ошибка: ${err}`));
   }
 
-  function handleRegistration(email, password) {
+  function handleRegistration(password, email) {
     auth
-      .register(email, password)
-      .then(() => {
-        setIsRegistration(true);
+      .register(password, email)
+      .then((data) => {
+        if (data.jwt){
         setInfoTooltip(true);
+        setIsRegistration(true);
+        //setFormValue('', ''});
         navigate("/signin", { replace: true });
+        }
       })
       .catch((err) => {
-        setIsRegistration(false);
         setInfoTooltip(true);
+        setIsRegistration(false);
         console.log(err);
       });
   }
 
-  function handleLogin(email, password) {
+  function handleLogin(password, email) {
     auth
-      .login(email, password)
+      .login(password, email)
       .then((data) => {
         setLoggedIn(true);
-        localStorage.setItem("token", data.token);
-        checkActiveToken(data.token);
-        setEmail(data.email);
-        navigate("/main", { replace: true });
+        localStorage.setItem("jwt", data);
+        checkActiveToken();
+        setEmail(data);
+        navigate("/", { replace: true });
       })
       .catch((err) => {
         setIsRegistration(false);
@@ -160,17 +163,17 @@ function App() {
   }
 
   function checkActiveToken() {
-    const jwt = localStorage.getItem('jwt');
+    const token = localStorage.getItem("jwt");
 
     auth
-      .checkToken(jwt)
+      .checkToken(token)
       .then((res) => {
         if (!res) {
           return;
         }
         setLoggedIn(true);
         setEmail(res);
-       // navigate("/main", { replace: true });
+        //navigate("/", { replace: true });
       })
       .catch((err) => {
         setLoggedIn(false);
@@ -216,7 +219,7 @@ function App() {
                 <Login 
                   title="Вход" 
                   buttonText="Войти" 
-                  onSubmit={handleLogin} 
+                  handleSubmit={handleLogin} 
                 />
               }
             />
@@ -226,57 +229,54 @@ function App() {
                 <Register
                   title="Регистрация"
                   buttonText="Зарегистрироваться"
-                  onSubmit={handleRegistration}
+                  handleSubmit={handleRegistration}
+                  isRegistration={isRegistration}
                 />
               }
             />
             <Route
-              element={
-                <EditAvatarPopup
-                  isOpen={isEditAvatarPopupOpen}
-                  onClose={closeAllPopups}
-                  onUpdateAvatar={handleUpdateAvatar}
-                />
-              }
-            />
-            <Route
-              element={
-                <EditProfilePopup
-                  isOpen={isEditProfilePopupOpen}
-                  onClose={closeAllPopups}
-                  onUpdateUser={handleUpdateUser}
-                />
-              }
-            />
-            <Route
-              element={
-                <AddPlacePopup
-                  isOpen={isAddPlacePopupOpen}
-                  onClose={closeAllPopups}
-                  onAddPlace={handleSubmitAddPlace}
-                />
-              }
-            />
-            <Route
-              element={
-                <PopupWithForm
-                  title="Вы уверены?"
-                  name="confitmation"
-                  onClose={closeAllPopups}
-                  buttonText="Да"
-                />
-              }
-            />
-            <Route
-              element={
-                <ImagePopup
-                  card={selectedCard}
-                  onClose={closeAllPopups}
-                  isOpen={selectedCard}
-                />
-              }
+              path="*"
+              element={<Navigate to="/"replace/>}
             />
           </Routes>
+            <EditAvatarPopup
+              isOpen={isEditAvatarPopupOpen}
+              onClose={closeAllPopups}
+              onUpdateAvatar={handleUpdateAvatar}
+            />
+            <EditProfilePopup
+              isOpen={isEditProfilePopupOpen}
+              onClose={closeAllPopups}
+              onUpdateUser={handleUpdateUser}
+            />
+            <AddPlacePopup
+              isOpen={isAddPlacePopupOpen}
+              onClose={closeAllPopups}
+              onAddPlace={handleSubmitAddPlace}
+            />
+            <PopupWithForm
+              title="Вы уверены?"
+              name="confitmation"
+              onClose={closeAllPopups}
+              buttonText="Да"
+            />
+            <ImagePopup
+              card={selectedCard}
+              onClose={closeAllPopups}
+              isOpen={selectedCard}
+            />
+            <InfoToolTip
+              name="success"
+              onClose={closeAllPopups}
+              isOpen={infoToolTip}
+              title={"Вы успешно зарегистрировались!"}
+            />
+            <InfoToolTip
+              name="unsuccess"
+              onClose={closeAllPopups}
+              isOpen={infoToolTip}
+              title={"Что-то пошло не так! Попробуйте ещё раз."}
+            />
         </div>
       </div>
     </CurrentUserContext.Provider>

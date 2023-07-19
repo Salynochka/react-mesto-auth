@@ -9,7 +9,6 @@ function Login(props) {
     password: "",
     email: "",
   });
-  const navigate = useNavigate()
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -19,15 +18,9 @@ function Login(props) {
     });
   }
 
-  function handleSubmit() {
-    auth.login(formValue.password, formValue.email)
-      .then((data) => {
-        if (data.jwt){
-          setFormValue({password: '', email: ''});
-          navigate('/main', {replace: true});
-        }
-      })
-      .catch(err => console.log(err));
+  function handleSubmit(e) {
+    e.preventDefault();
+    props.handleSubmit(formValue.password, formValue.email)
   }
 
   return (

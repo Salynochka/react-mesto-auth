@@ -9,8 +9,6 @@ function Register(props) {
     email: "",
   });
 
-  const navigate = useNavigate();
-
   function handleChange(e) {
     const {name, value} = e.target;
     setFormValue({
@@ -21,17 +19,7 @@ function Register(props) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!formValue.password || !formValue.email){
-      return;
-    }
-    auth.register({password:formValue.password, email:formValue.email})
-      .then((data) => {
-        if (data.jwt){
-          setFormValue({password: '', email: ''});
-          navigate('/signin', {replace: true});
-        }
-      })
-      .catch(err => console.log(err));
+    props.handleSubmit(formValue.password, formValue.email)
   }
 
   return (
