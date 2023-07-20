@@ -27,12 +27,11 @@ function App() {
   const [cards, setCards] = React.useState([]);
 
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [mainIsOpened, setMainIsOpened] = React.useState(false);
 
   const [isRegistration, setIsRegistration] = React.useState(false);
   const [isSuccessful, setIsSuccessful] = React.useState(false);
   const [email, setEmail] = React.useState("");
-
-  //const [infoToolTip, setInfoTooltip] = React.useState(false);
 
   const navigate = useNavigate();
 
@@ -140,13 +139,13 @@ function App() {
       .register(password, email)
       .then(() => {
         setIsRegistration(true);
-        setIsSuccessful(true)
+        setIsSuccessful(true);
         setInfoToolTipOpen(true);
         navigate("/signin", { replace: true });
       })
       .catch((err) => {
         setInfoToolTipOpen(true);
-        setIsSuccessful(false)
+        setIsSuccessful(false);
         setIsRegistration(false);
         console.log(err);
       });
@@ -158,38 +157,40 @@ function App() {
     }
     auth
       .login(password, email)
-      .then((data) => {
-        if (data.jwt) {
-          setIsLoggedIn(true);
-          localStorage.setItem("jwt", data.token);
-          checkActiveToken();
-          setEmail(email);
-          navigate("/", { replace: true });
-        }
+      .then((res) => {
+        setIsLoggedIn(true);
+        localStorage.setItem("jwt", res);
+        checkActiveToken();
+        setEmail(email);
+        setMainIsOpened(true);
+        navigate("/", { replace: true });
       })
       .catch((err) => {
         console.log(err);
-        setIsLoggedIn(false)
+        setIsLoggedIn(false);
+        setInfoToolTipOpen(true);
+        setIsSuccessful(false)
       });
   }
 
   function checkActiveToken() {
-    const token = localStorage.getItem("jwt");
-
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
     auth
-      .checkToken(token)
+      .checkToken(jwt)
       .then((res) => {
         if (!res) {
           return;
         }
         setIsLoggedIn(true);
-        setEmail(res.data.email);
-        //navigate("/", { replace: true });
+        setEmail(res.email);
+        navigate("/", { replace: true });
       })
       .catch((err) => {
         setIsLoggedIn(false);
         console.log(err);
       });
+    }
   }
 
   React.useEffect(() => {
@@ -223,6 +224,7 @@ function App() {
                   cards={cards}
                   onExit={handleSignOut}
                   email={email}
+                  mainIsOpened={mainIsOpened}
                 />
               }
             />
@@ -233,7 +235,6 @@ function App() {
                   title="Вход" 
                   buttonText="Войти" 
                   handleSubmit={handleLogin} 
-                  setEmail={setEmail}
                 />
               }
             />
@@ -244,8 +245,7 @@ function App() {
                   title="Регистрация"
                   buttonText="Зарегистрироваться"
                   handleSubmit={handleRegistration}
-                  isRegistration={isRegistration}
-                  setIsSuccessful={setIsSuccessful}
+                  isSuccessful={isSuccessful}
                 />
               }
             />
@@ -285,6 +285,7 @@ function App() {
               onClose={closeAllPopups}
               isOpen={isInfoToolTipOpen}
               isSuccessful={isSuccessful}
+              isRegistration={isRegistration}
             />
         </div>
       </div>

@@ -1,8 +1,5 @@
 import React from "react";
 import Header from "./Header.js";
-import * as auth from "../utils/auth.js";
-import {useNavigate} from "react-router-dom";
-//import Register from "./Register.js";
 
 function Login(props) {
   const [formValue, setFormValue] = React.useState({

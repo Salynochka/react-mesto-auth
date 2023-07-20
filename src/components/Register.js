@@ -1,7 +1,5 @@
 import React from "react";
 import Header from "./Header.js";
-import * as auth from "../utils/auth.js";
-import {useNavigate} from 'react-router-dom';
 
 function Register(props) {
   const [formValue, setFormValue] = React.useState({
