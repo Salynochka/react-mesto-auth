@@ -8,7 +8,8 @@
     background-color: white;
     margin: auto;
     position: relative;
-    
+    align-items: center;
+    justify-content: center;
 }
 
 @media screen and (max-width: 500px){

@@ -6,6 +6,8 @@
     color: black;
     margin: 0;
     padding-top: 34px;
+    text-align: center;
+    width: 358px;
 }
 
 @media screen and (max-width: 500px){

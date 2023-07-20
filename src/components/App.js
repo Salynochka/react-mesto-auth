@@ -18,18 +18,21 @@ function App() {
   const [isEditAvatarPopupOpen, setEditAvatarPopup] = React.useState(false);
   const [isEditProfilePopupOpen, setEditProfilePopup] = React.useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopup] = React.useState(false);
+  const [isConfirmationPopupOpen, setConfirmationPopupOpen] = React.useState(false);
+  const [isInfoToolTipOpen, setInfoToolTipOpen] = React.useState(false);
 
   const [selectedCard, setSelectedCard] = React.useState({});
 
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
 
-  const [isLoggedIn, setLoggedIn] = React.useState(false);
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
   const [isRegistration, setIsRegistration] = React.useState(false);
+  const [isSuccessful, setIsSuccessful] = React.useState(false);
   const [email, setEmail] = React.useState("");
 
-  const [infoToolTip, setInfoTooltip] = React.useState(false);
+  //const [infoToolTip, setInfoTooltip] = React.useState(false);
 
   const navigate = useNavigate();
 
@@ -72,7 +75,9 @@ function App() {
     setEditAvatarPopup(false);
     setEditProfilePopup(false);
     setAddPlacePopup(false);
+    setConfirmationPopupOpen(false)
     setSelectedCard({});
+    setInfoToolTipOpen(false)
   }
 
   function handleCardLike(card) {
@@ -128,37 +133,43 @@ function App() {
   }
 
   function handleRegistration(password, email) {
+    if (!password || !email) {
+      return;
+    }
     auth
       .register(password, email)
-      .then((data) => {
-        if (data.jwt){
-        setInfoTooltip(true);
+      .then(() => {
         setIsRegistration(true);
-        //setFormValue('', ''});
+        setIsSuccessful(true)
+        setInfoToolTipOpen(true);
         navigate("/signin", { replace: true });
-        }
       })
       .catch((err) => {
-        setInfoTooltip(true);
+        setInfoToolTipOpen(true);
+        setIsSuccessful(false)
         setIsRegistration(false);
         console.log(err);
       });
   }
 
   function handleLogin(password, email) {
+    if (!password || !email) {
+      return;
+    }
     auth
       .login(password, email)
       .then((data) => {
-        setLoggedIn(true);
-        localStorage.setItem("jwt", data);
-        checkActiveToken();
-        setEmail(data);
-        navigate("/", { replace: true });
+        if (data.jwt) {
+          setIsLoggedIn(true);
+          localStorage.setItem("jwt", data.token);
+          checkActiveToken();
+          setEmail(email);
+          navigate("/", { replace: true });
+        }
       })
       .catch((err) => {
-        setIsRegistration(false);
-        setInfoTooltip(true);
         console.log(err);
+        setIsLoggedIn(false)
       });
   }
 
@@ -171,12 +182,12 @@ function App() {
         if (!res) {
           return;
         }
-        setLoggedIn(true);
-        setEmail(res);
+        setIsLoggedIn(true);
+        setEmail(res.data.email);
         //navigate("/", { replace: true });
       })
       .catch((err) => {
-        setLoggedIn(false);
+        setIsLoggedIn(false);
         console.log(err);
       });
   }
@@ -186,7 +197,7 @@ function App() {
   }, []);
 
   function handleSignOut() {
-    setLoggedIn(false);
+    setIsLoggedIn(false);
     localStorage.removeItem("jwt");
     setEmail("");
     navigate("/signin", { replace: true });
@@ -210,6 +221,8 @@ function App() {
                   onCardLike={handleCardLike}
                   onCardDelete={handleCardDelete}
                   cards={cards}
+                  onExit={handleSignOut}
+                  email={email}
                 />
               }
             />
@@ -220,6 +233,7 @@ function App() {
                   title="Вход" 
                   buttonText="Войти" 
                   handleSubmit={handleLogin} 
+                  setEmail={setEmail}
                 />
               }
             />
@@ -231,6 +245,7 @@ function App() {
                   buttonText="Зарегистрироваться"
                   handleSubmit={handleRegistration}
                   isRegistration={isRegistration}
+                  setIsSuccessful={setIsSuccessful}
                 />
               }
             />
@@ -259,6 +274,7 @@ function App() {
               name="confitmation"
               onClose={closeAllPopups}
               buttonText="Да"
+              isOpen={isConfirmationPopupOpen}
             />
             <ImagePopup
               card={selectedCard}
@@ -266,16 +282,9 @@ function App() {
               isOpen={selectedCard}
             />
             <InfoToolTip
-              name="success"
               onClose={closeAllPopups}
-              isOpen={infoToolTip}
-              title={"Вы успешно зарегистрировались!"}
-            />
-            <InfoToolTip
-              name="unsuccess"
-              onClose={closeAllPopups}
-              isOpen={infoToolTip}
-              title={"Что-то пошло не так! Попробуйте ещё раз."}
+              isOpen={isInfoToolTipOpen}
+              isSuccessful={isSuccessful}
             />
         </div>
       </div>

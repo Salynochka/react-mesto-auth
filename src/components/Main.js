@@ -13,7 +13,9 @@ function Main(props) {
       <Header 
         text="Выйти"
         link="signin"
-        //title={email}
+        onExit={props.onExit}
+        email={props.email}
+        mainIsOpened={props.mainIsOpened}
       />
       <main>
         <section className="profile">

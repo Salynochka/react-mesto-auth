@@ -5,7 +5,10 @@ function Header(props) {
   return (
     <header className="header">
       <div className="header__logo" src={logo}></div>
-      <a className="header__text" href={props.link}>{props.text}</a>
+      <div className={`header__info${props.mainIsOpened ? "_visible" : ""}`}>
+        {props.email && <p className="header__email">{props.email}</p>}
+        <a className="header__text" href={props.link} onClick={props.onExit}>{props.text}</a>
+      </div>
     </header>
   );
 }
