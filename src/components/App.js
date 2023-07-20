@@ -137,7 +137,7 @@ function App() {
     }
     auth
       .register(password, email)
-      .then(() => {
+      .then((res) => {
         setIsRegistration(true);
         setIsSuccessful(true);
         setInfoToolTipOpen(true);
@@ -180,11 +180,10 @@ function App() {
       .checkToken(jwt)
       .then((res) => {
         if (!res) {
-          return;
-        }
-        setIsLoggedIn(true);
-        setEmail(res.email);
-        navigate("/", { replace: true });
+          setIsLoggedIn(true);
+          setEmail(res.email);
+          navigate("/", { replace: true });
+      }
       })
       .catch((err) => {
         setIsLoggedIn(false);
