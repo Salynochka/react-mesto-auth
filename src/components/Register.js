@@ -1,5 +1,6 @@
 import React from "react";
 import Header from "./Header.js";
+import {Link} from "react-router-dom";
 
 function Register(props) {
   const [formValue, setFormValue] = React.useState({
@@ -24,7 +25,7 @@ function Register(props) {
     <>
       <Header 
         text="Войти"
-        link="signin"
+        link="/signin"
       />
       <section className="register">
         <div className="register__container" onSubmit={handleSubmit}>
@@ -32,6 +33,7 @@ function Register(props) {
           <form
             className="register__form"
             name="login"
+            onSubmit={handleSubmit}
           >
             <fieldset className="register__input">
               <input
@@ -43,6 +45,7 @@ function Register(props) {
                 maxLength="40"
                 required
                 onChange={handleChange}
+                value={formValue.email || ""}
               />
               <span className="register__form-error register__form-error_type_email email-error" />
               <input
@@ -54,13 +57,14 @@ function Register(props) {
                 maxLength="200"
                 required
                 onChange={handleChange}
+                value={formValue.password || ""}
               />
               <span className="register__form-error register__form-error_type_password password-error" />
             </fieldset>
-            <button className="register__button" type="submit" onSubmit={handleSubmit}>
+            <button className="register__button" type="submit">
               {props.buttonText}
             </button>
-            <a className="register__to-login" href="signin">Уже зарегистрированы? Войти</a>
+            <Link to="/signin" className="register__to-login">Уже зарегистрированы? Войти</Link>
           </form>
         </div>
       </section>

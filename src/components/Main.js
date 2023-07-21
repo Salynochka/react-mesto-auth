@@ -12,7 +12,7 @@ function Main(props) {
     <>
       <Header 
         text="Выйти"
-        link="signin"
+        link="/signin"
         onExit={props.onExit}
         email={props.email}
         mainIsOpened={props.mainIsOpened}

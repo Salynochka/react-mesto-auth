@@ -11,7 +11,7 @@ export const register = (password, email) => {
       email: email
     }),
   })
-    .then((response) => response.json())
+    .then(checkStatus)
 }
 
 export const login = (password, email) => {
@@ -25,7 +25,7 @@ export const login = (password, email) => {
       email: email
     }),
   })
-    .then((response) => response.json())
+    .then(checkStatus)
     .then((data) => {
       if (data.jwt) {
         localStorage.setItem("jwt", data.jwt);
@@ -34,7 +34,6 @@ export const login = (password, email) => {
         return;
       }
     })
-    .catch((err) => console.log(err));
 }
 
 export const checkToken = (token) => {
@@ -45,6 +44,13 @@ export const checkToken = (token) => {
       "Authorization": `Bearer ${token}`,
     },
   })
-    .then((res) => res.json())
+    .then(checkStatus)
     .then((data) => data);
+}
+
+function checkStatus(res){
+  if (res.ok) {
+    return res.json();
+  }
+  return Promise.reject(`Ошибка: ${res.status}`);
 }

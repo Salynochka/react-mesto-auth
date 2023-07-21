@@ -27,7 +27,7 @@ function App() {
   const [cards, setCards] = React.useState([]);
 
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [mainIsOpened, setMainIsOpened] = React.useState(false);
+  const [mainIsOpened, setMainIsOpened] = React.useState(false); 
 
   const [isRegistration, setIsRegistration] = React.useState(false);
   const [isSuccessful, setIsSuccessful] = React.useState(false);
@@ -79,6 +79,23 @@ function App() {
     setInfoToolTipOpen(false)
   }
 
+  const isOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || selectedCard.link
+
+  useEffect(() => {
+    function closeByEscape(evt) {
+      if(evt.key === 'Escape') {
+        closeAllPopups();
+      }
+    }
+    if(isOpen) { // навешиваем только при открытии
+      document.addEventListener('keydown', closeByEscape);
+      return () => {
+        document.removeEventListener('keydown', closeByEscape);
+      }
+    }
+  }, [isOpen]) 
+
+
   function handleCardLike(card) {
     // Проверка наличия лайка на этой карточке
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
@@ -128,7 +145,7 @@ function App() {
         setCards([newCard, ...cards]);
         closeAllPopups();
       })
-      .catch((err) => console.error(`Ошибка: ${err}`));
+      .catch((err) => console.error(`Ошибка: ${err}`))
   }
 
   function handleRegistration(password, email) {
@@ -137,18 +154,19 @@ function App() {
     }
     auth
       .register(password, email)
-      .then((res) => {
+      .then(() => {
         setIsRegistration(true);
         setIsSuccessful(true);
-        setInfoToolTipOpen(true);
         navigate("/signin", { replace: true });
       })
       .catch((err) => {
-        setInfoToolTipOpen(true);
-        setIsSuccessful(false);
         setIsRegistration(false);
+        setIsSuccessful(false);
         console.log(err);
-      });
+      })
+      .finally(() => {
+        setInfoToolTipOpen(true);
+      })
   }
 
   function handleLogin(password, email) {
@@ -160,7 +178,6 @@ function App() {
       .then((res) => {
         setIsLoggedIn(true);
         localStorage.setItem("jwt", res);
-        checkActiveToken();
         setEmail(email);
         setMainIsOpened(true);
         navigate("/", { replace: true });
@@ -179,7 +196,7 @@ function App() {
     auth
       .checkToken(jwt)
       .then((res) => {
-        if (!res) {
+        if (res) {
           setIsLoggedIn(true);
           setEmail(res.email);
           navigate("/", { replace: true });

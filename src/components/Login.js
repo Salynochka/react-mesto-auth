@@ -24,7 +24,7 @@ function Login(props) {
     <>
       <Header 
         text="Регистрация" 
-        link="signup"
+        link="/signup"
       />
       <section className="login">
         <div className="login__container" onSubmit={handleSubmit}>
@@ -40,6 +40,7 @@ function Login(props) {
                 maxLength="40"
                 required
                 onChange={handleChange}
+                value={formValue.email || ""}
               />
               <span className="login__form-error login__form-error_type_email email-error" />
               <input
@@ -51,6 +52,7 @@ function Login(props) {
                 maxLength="200"
                 required
                 onChange={handleChange}
+                value={formValue.password || ""}
               />
               <span className="login__form-error login__form-error_type_password password-error" />
             </fieldset>
