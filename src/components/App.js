@@ -18,8 +18,7 @@ function App() {
   const [isEditAvatarPopupOpen, setEditAvatarPopup] = React.useState(false);
   const [isEditProfilePopupOpen, setEditProfilePopup] = React.useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopup] = React.useState(false);
-  const [isConfirmationPopupOpen, setConfirmationPopupOpen] =
-    React.useState(false);
+  const [isConfirmationPopupOpen, setConfirmationPopupOpen] = React.useState(false);
   const [isInfoToolTipOpen, setInfoToolTipOpen] = React.useState(false);
 
   const [selectedCard, setSelectedCard] = React.useState({});
