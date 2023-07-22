@@ -11,14 +11,15 @@ import InfoToolTip from "./InfoToolTip.js";
 import * as auth from "../utils/auth.js";
 import { api } from "../utils/api.js";
 import { CurrentUserContext } from "../context/CurrentUserContext.js";
-import { Routes, Route, useNavigate, Navigate} from "react-router-dom";
+import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute.js";
 
 function App() {
   const [isEditAvatarPopupOpen, setEditAvatarPopup] = React.useState(false);
   const [isEditProfilePopupOpen, setEditProfilePopup] = React.useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopup] = React.useState(false);
-  const [isConfirmationPopupOpen, setConfirmationPopupOpen] = React.useState(false);
+  const [isConfirmationPopupOpen, setConfirmationPopupOpen] =
+    React.useState(false);
   const [isInfoToolTipOpen, setInfoToolTipOpen] = React.useState(false);
 
   const [selectedCard, setSelectedCard] = React.useState({});
@@ -27,7 +28,7 @@ function App() {
   const [cards, setCards] = React.useState([]);
 
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [mainIsOpened, setMainIsOpened] = React.useState(false); 
+  const [mainIsOpened, setMainIsOpened] = React.useState(false);
 
   const [isRegistration, setIsRegistration] = React.useState(false);
   const [isSuccessful, setIsSuccessful] = React.useState(false);
@@ -74,27 +75,31 @@ function App() {
     setEditAvatarPopup(false);
     setEditProfilePopup(false);
     setAddPlacePopup(false);
-    setConfirmationPopupOpen(false)
+    setConfirmationPopupOpen(false);
     setSelectedCard({});
-    setInfoToolTipOpen(false)
+    setInfoToolTipOpen(false);
   }
 
-  const isOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || selectedCard.link
+  const isOpen =
+    isEditAvatarPopupOpen ||
+    isEditProfilePopupOpen ||
+    isAddPlacePopupOpen ||
+    selectedCard.link;
 
   useEffect(() => {
     function closeByEscape(evt) {
-      if(evt.key === 'Escape') {
+      if (evt.key === "Escape") {
         closeAllPopups();
       }
     }
-    if(isOpen) { // навешиваем только при открытии
-      document.addEventListener('keydown', closeByEscape);
+    if (isOpen) {
+      // навешиваем только при открытии
+      document.addEventListener("keydown", closeByEscape);
       return () => {
-        document.removeEventListener('keydown', closeByEscape);
-      }
+        document.removeEventListener("keydown", closeByEscape);
+      };
     }
-  }, [isOpen]) 
-
+  }, [isOpen]);
 
   function handleCardLike(card) {
     // Проверка наличия лайка на этой карточке
@@ -145,7 +150,7 @@ function App() {
         setCards([newCard, ...cards]);
         closeAllPopups();
       })
-      .catch((err) => console.error(`Ошибка: ${err}`))
+      .catch((err) => console.error(`Ошибка: ${err}`));
   }
 
   function handleRegistration(password, email) {
@@ -166,7 +171,7 @@ function App() {
       })
       .finally(() => {
         setInfoToolTipOpen(true);
-      })
+      });
   }
 
   function handleLogin(password, email) {
@@ -176,36 +181,39 @@ function App() {
     auth
       .login(password, email)
       .then((res) => {
-        setIsLoggedIn(true);
-        localStorage.setItem("jwt", res);
-        setEmail(email);
-        setMainIsOpened(true);
-        navigate("/", { replace: true });
+        if (res) {
+          setIsLoggedIn(true);
+          localStorage.setItem("jwt", res.token);
+          setEmail(email);
+          setMainIsOpened(true);
+          navigate("/", { replace: true });
+        }
       })
       .catch((err) => {
         console.log(err);
         setIsLoggedIn(false);
         setInfoToolTipOpen(true);
-        setIsSuccessful(false)
+        setIsSuccessful(false);
       });
   }
 
   function checkActiveToken() {
     const jwt = localStorage.getItem("jwt");
+    console.log(jwt);
     if (jwt) {
-    auth
-      .checkToken(jwt)
-      .then((res) => {
-        if (res) {
-          setIsLoggedIn(true);
-          setEmail(res.email);
-          navigate("/", { replace: true });
-      }
-      })
-      .catch((err) => {
-        setIsLoggedIn(false);
-        console.log(err);
-      });
+      auth
+        .checkToken(jwt)
+        .then((res) => {
+          if (res) {
+            setIsLoggedIn(true);
+            setEmail(res.email);
+            navigate("/", { replace: true });
+          }
+        })
+        .catch((err) => {
+          setIsLoggedIn(false);
+          console.log(err);
+        });
     }
   }
 
@@ -247,10 +255,10 @@ function App() {
             <Route
               path="/signin"
               element={
-                <Login 
-                  title="Вход" 
-                  buttonText="Войти" 
-                  handleSubmit={handleLogin} 
+                <Login
+                  title="Вход"
+                  buttonText="Войти"
+                  handleSubmit={handleLogin}
                 />
               }
             />
@@ -265,44 +273,41 @@ function App() {
                 />
               }
             />
-            <Route
-              path="*"
-              element={<Navigate to="/"replace/>}
-            />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-            <EditAvatarPopup
-              isOpen={isEditAvatarPopupOpen}
-              onClose={closeAllPopups}
-              onUpdateAvatar={handleUpdateAvatar}
-            />
-            <EditProfilePopup
-              isOpen={isEditProfilePopupOpen}
-              onClose={closeAllPopups}
-              onUpdateUser={handleUpdateUser}
-            />
-            <AddPlacePopup
-              isOpen={isAddPlacePopupOpen}
-              onClose={closeAllPopups}
-              onAddPlace={handleSubmitAddPlace}
-            />
-            <PopupWithForm
-              title="Вы уверены?"
-              name="confitmation"
-              onClose={closeAllPopups}
-              buttonText="Да"
-              isOpen={isConfirmationPopupOpen}
-            />
-            <ImagePopup
-              card={selectedCard}
-              onClose={closeAllPopups}
-              isOpen={selectedCard}
-            />
-            <InfoToolTip
-              onClose={closeAllPopups}
-              isOpen={isInfoToolTipOpen}
-              isSuccessful={isSuccessful}
-              isRegistration={isRegistration}
-            />
+          <EditAvatarPopup
+            isOpen={isEditAvatarPopupOpen}
+            onClose={closeAllPopups}
+            onUpdateAvatar={handleUpdateAvatar}
+          />
+          <EditProfilePopup
+            isOpen={isEditProfilePopupOpen}
+            onClose={closeAllPopups}
+            onUpdateUser={handleUpdateUser}
+          />
+          <AddPlacePopup
+            isOpen={isAddPlacePopupOpen}
+            onClose={closeAllPopups}
+            onAddPlace={handleSubmitAddPlace}
+          />
+          <PopupWithForm
+            title="Вы уверены?"
+            name="confitmation"
+            onClose={closeAllPopups}
+            buttonText="Да"
+            isOpen={isConfirmationPopupOpen}
+          />
+          <ImagePopup
+            card={selectedCard}
+            onClose={closeAllPopups}
+            isOpen={selectedCard}
+          />
+          <InfoToolTip
+            onClose={closeAllPopups}
+            isOpen={isInfoToolTipOpen}
+            isSuccessful={isSuccessful}
+            isRegistration={isRegistration}
+          />
         </div>
       </div>
     </CurrentUserContext.Provider>

@@ -26,14 +26,6 @@ export const login = (password, email) => {
     }),
   })
     .then(checkStatus)
-    .then((data) => {
-      if (data.jwt) {
-        localStorage.setItem("jwt", data.jwt);
-        return data;
-      } else {
-        return;
-      }
-    })
 }
 
 export const checkToken = (token) => {
