@@ -183,8 +183,8 @@ function App() {
         if (res) {
           setIsLoggedIn(true);
           localStorage.setItem("jwt", res.token);
-          setEmail(email);
           setMainIsOpened(true);
+          setEmail(email);
           navigate("/", { replace: true });
         }
       })
@@ -198,14 +198,14 @@ function App() {
 
   function checkActiveToken() {
     const jwt = localStorage.getItem("jwt");
-    console.log(jwt);
     if (jwt) {
       auth
         .checkToken(jwt)
         .then((res) => {
           if (res) {
             setIsLoggedIn(true);
-            setEmail(res.email);
+            setMainIsOpened(true);
+            setEmail(res.data.email);
             navigate("/", { replace: true });
           }
         })
@@ -216,6 +216,7 @@ function App() {
     }
   }
 
+  
   React.useEffect(() => {
     checkActiveToken();
   }, []);
@@ -224,6 +225,7 @@ function App() {
     setIsLoggedIn(false);
     localStorage.removeItem("jwt");
     setEmail("");
+    setMainIsOpened(false);
     navigate("/signin", { replace: true });
   }
 
